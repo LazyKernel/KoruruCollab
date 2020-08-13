@@ -18,13 +18,32 @@ def testFunction():
     # show a message box
     #showInfo("Card count: %d" % cardCount)
 
-    kanji = web.WebEndpoint('https://koruru.org', 3001).get('/api/kanji/list')
-    showInfo(str(kanji))
+    #kanji = web.WebEndpoint('https://koruru.org', 3001).get('/api/kanji/list')
+    #showInfo(str(kanji))
+    pass
+
+def syncFunction():
+    pass
+
+def addFunction():
+    pass
 
 
-# create a new menu item, "test"
-action = QAction("test", mw)
-# set it to call testFunction when it's clicked
-action.triggered.connect(testFunction)
-# and add it to the tools menu
-mw.form.menuTools.addAction(action)
+def initGUI():
+    mw.Koruru = QMenu('Koruru', mw)
+    
+    add = QAction('Add shared deck', mw)
+    add.triggered.connect(addFunction)
+    mw.Koruru.addAction(add)
+
+    sync = QAction('Sync shared decks', mw)
+    sync.triggered.connect(syncFunction)
+    mw.Koruru.addAction(sync)
+
+    action = QAction('Test', mw)
+    action.triggered.connect(testFunction)
+    mw.Koruru.addAction(action)
+
+    mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.Koruru)
+
+initGUI()
