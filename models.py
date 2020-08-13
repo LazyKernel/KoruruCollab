@@ -2,7 +2,7 @@ from aqt import mw
 from anki.stdmodels import models
 
 name = 'Koruru'
-fields = ['word-jp', 'word-en', 'sentence-jp', 'sentence-en', 'media', 'koruru-id', 'operation-id']
+fields = ['word-jp', 'word-en', 'sentence-jp', 'sentence-en', 'koruru-id', 'operation-id']
 
 front = '''
 
