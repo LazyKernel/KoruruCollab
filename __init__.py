@@ -1,32 +1,48 @@
-# import the main window object (mw) from aqt
 from aqt import mw
-# import the "show info" tool from utils.py
-from aqt.utils import showInfo
-# import all of the Qt GUI library
+from aqt.utils import showInfo, getOnlyText
 from aqt.qt import *
 
 from . import web
+from . import decks
+from . import models
+from . import notes
 
 
-# We're going to add a menu item below. First we want to create a function to
-# be called when the menu item is activated.
-
-def testFunction():
-    # get the number of cards in the current collection, which is stored in
-    # the main window
-    #cardCount = mw.col.cardCount()
-    # show a message box
-    #showInfo("Card count: %d" % cardCount)
-
-    #kanji = web.WebEndpoint('https://koruru.org', 3001).get('/api/kanji/list')
-    #showInfo(str(kanji))
-    pass
+koruruEndpoint = web.WebEndpoint('https://koruru.org', 3001)
 
 def syncFunction():
-    pass
+    def syncFun():
+        koruruDecks = decks.getAllKoruruDecks()
+        for deck in koruruDecks:
+            highestOp = decks.getLastestOperationFromDeck(deck['deckId'])
+            response = koruruEndpoint.get('/api/collab/' + str(deck['koruruId']) + '&' + str(highestOp))
+            notes.bulkApplyOperations(deck['deckId'], response['operations'])
+
+    def onDone(fut):
+        showInfo('Succesfully synced decks from koruru.org')
+
+    mw.taskman.with_progress(syncFun, on_done=onDone, label='Syncing from koruru.org...', immediate=True)
+
 
 def addFunction():
-    pass
+    token = getOnlyText('Shared deck token: ')
+    ops = 0
+
+    def addFunc():
+        if not models.noteTypeExists():
+            models.createModel()
+        
+        response = koruruEndpoint.get('/api/collab/' + token)
+        deckId = decks.createNewDeck(response['token'], response['name'])
+        ops = notes.bulkApplyOperations(deckId, response['operations'])
+
+    def onDone(fut):
+        showInfo('Successfully executed {op} {opStr}.'.format(
+            op=ops,
+            opStr='operations.' if ops != 1 else 'operation.'
+        ))
+    
+    mw.taskman.with_progress(addFunc, on_done=onDone, label='Syncing from koruru.org...', immediate=True)
 
 
 def initGUI():
@@ -39,10 +55,6 @@ def initGUI():
     sync = QAction('Sync shared decks', mw)
     sync.triggered.connect(syncFunction)
     mw.Koruru.addAction(sync)
-
-    action = QAction('Test', mw)
-    action.triggered.connect(testFunction)
-    mw.Koruru.addAction(action)
 
     mw.form.menubar.insertMenu(mw.form.menuHelp.menuAction(), mw.Koruru)
 

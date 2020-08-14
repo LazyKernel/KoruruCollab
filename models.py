@@ -2,7 +2,7 @@ from aqt import mw
 from anki.stdmodels import models
 
 name = 'Koruru'
-fields = ['word-jp', 'word-en', 'sentence-jp', 'sentence-en', 'koruru-id', 'operation-id']
+fields = ['word_jp', 'word_en', 'sentence_jp', 'sentence_en', 'card_id', 'operation_id']
 
 front = '''
 
@@ -32,3 +32,6 @@ def createModel():
 
 def getKoruruNoteType():
     return mw.col.models.byName(name)
+
+def noteTypeExists():
+    return not getKoruruNoteType()

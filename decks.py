@@ -29,10 +29,9 @@ def createNewDeck(koruruId, name):
     mw.col.decks.save(deck)
     return deckId
 
-def getLastestOperationFromDeck(koruruId):
-    deck = getKoruruDeck(koruruId)
+def getLastestOperationFromDeck(deckId):
     latestOp = -1
-    for child in mw.col.decks.cids(deck['id']):
+    for child in mw.col.decks.cids(deckId):
         note = mw.col.getCard(child).note()
         if note['operation-id'] > latestOp:
             latestOp = note['operation-id']
